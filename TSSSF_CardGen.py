@@ -597,8 +597,8 @@ def MakeStartCardJSON(data):
     text_size = FlavorText(image, data.get('flavor', ''), ColorDict["START flavor"])
     BodyText(image, data.get('body', ''), ColorDict["START"], text_size)
     CopyrightText(data, image, ColorDict["Copyright"], data.get('artist', DEFAULT_ARTIST))
-    AddOverlay(image, data['overlay'])
     AddExpansion(image, data['expansion'])
+    AddOverlay(image, data['overlay'])
     return image
 
 
@@ -611,8 +611,8 @@ def MakeStartCardPON(tags):
     text_size = FlavorText(image, tags[FLAVOR], ColorDict["START flavor"])
     BodyText(image, tags[BODY], ColorDict["START"], text_size)
     CopyrightText(tags, image, ColorDict["Copyright"], (tags[ARTIST] or DEFAULT_ARTIST))
-    AddOverlay(image, tags[OVERLAY])
     AddExpansion(image, tags[EXPANSION])
+    AddOverlay(image, tags[OVERLAY])
     return image
 
 
@@ -632,8 +632,8 @@ def MakePonyCardJSON(data):
     text_size = FlavorText(image, data.get('flavor', ''), ColorDict["Pony flavor"])
     BodyText(image, data.get('body', ''), ColorDict["Pony"], text_size)
     CopyrightText(data, image, ColorDict["Copyright"], data.get('artist', DEFAULT_ARTIST))
-    AddOverlay(image, data['overlay'])
     AddExpansion(image, data['expansion'])
+    AddOverlay(image, data['overlay'])
     return image
 
 
@@ -646,8 +646,8 @@ def MakePonyCardPON(tags):
     text_size = FlavorText(image, tags[FLAVOR], ColorDict["Pony flavor"])
     BodyText(image, tags[BODY], ColorDict["Pony"], text_size)
     CopyrightText(tags, image, ColorDict["Copyright"], (tags[ARTIST] or DEFAULT_ARTIST))
-    AddOverlay(image, tags[OVERLAY])
     AddExpansion(image, tags[EXPANSION])
+    AddOverlay(image, tags[OVERLAY])
     return image
 
 
@@ -667,8 +667,8 @@ def MakeShipCardJSON(data):
     text_size = FlavorText(image, data.get('flavor', ''), ColorDict["Ship flavor"])
     BodyText(image, data.get('body', ''), ColorDict["Ship"], text_size)
     CopyrightText(data, image, ColorDict["Copyright"], data.get('artist', ARTIST))
-    AddOverlay(image, data['overlay'])
     AddExpansion(image, data['expansion'])
+    AddOverlay(image, data['overlay'])
     return image
 
 
@@ -681,8 +681,8 @@ def MakeShipCardPON(tags):
     text_size = FlavorText(image, tags[FLAVOR], ColorDict["Ship flavor"])
     BodyText(image, tags[BODY], ColorDict["Ship"], text_size)
     CopyrightText(tags, image, ColorDict["Copyright"], (tags[ARTIST] or DEFAULT_ARTIST))
-    AddOverlay(image, tags[OVERLAY])
     AddExpansion(image, tags[EXPANSION])
+    AddOverlay(image, tags[OVERLAY])
     return image
 
 
@@ -701,8 +701,8 @@ def MakeGoalCardJSON(data):
     text_size = FlavorText(image, data.get('flavor', ''), ColorDict["Goal flavor"])
     BodyText(image, data.get('body', ''), ColorDict["Goal"], text_size)
     CopyrightText(data, image, ColorDict["Copyright"], data.get('artist', ARTIST))
-    AddOverlay(image, data['overlay'])
     AddExpansion(image, data['expansion'])
+    AddOverlay(image, data['overlay'])
     return image
 
 
@@ -714,8 +714,8 @@ def MakeGoalCardPON(tags):
     text_size = FlavorText(image, tags[FLAVOR], ColorDict["Goal flavor"])
     BodyText(image, tags[BODY], ColorDict["Goal"], text_size)
     CopyrightText(tags, image, ColorDict["Copyright"], (tags[ARTIST] or DEFAULT_ARTIST))
-    AddOverlay(image, tags[OVERLAY])
     AddExpansion(image, tags[EXPANSION])
+    AddOverlay(image, tags[OVERLAY])
     return image
 
 
