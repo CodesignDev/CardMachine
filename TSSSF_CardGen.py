@@ -7,6 +7,7 @@ DIRECTORY = "TSSSF"
 DEFAULT_ARTIST = "Pixel Prism"
 
 Expansion_Icon = None
+GlobalExpansionIcon = None
 
 LegacySymbolMode = False
 PAGE_WIDTH = 3
@@ -531,9 +532,9 @@ def GetExpansionIcon(expansion):
 def AddExpansion(image, expansion):
     expansion_symbol = None
     if expansion is not '':
-        expansion_symbol = PIL_Helper.LoadImage(ExpansionIconsPath + expansion)
-    if Expansion_Icon is not None:
-        expansion_symbol = Expansion_Icon
+        expansion_symbol = PIL_Helper.LoadImage(os.path.join(ExpansionIconsPath, expansion))
+    if GlobalExpansionIcon is not None:
+        expansion_symbol = PIL_Helper.LoadImage(os.path.join(ExpansionIconsPath, GlobalExpansionIcon))
 
     if expansion_symbol:
         image.paste(expansion_symbol, Anchors["Expansion"], expansion_symbol)

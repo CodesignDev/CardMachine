@@ -60,7 +60,7 @@ def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json"):
         module.CardSet = card_set_text
         module.DEFAULT_ARTIST = data['deck'].get('defaultArtist', module.DEFAULT_ARTIST)
         if 'symbol' in data['deck']:
-            module.Expansion_Icon = module.GetExpansionIcon(data['deck']['symbol'])
+            module.GlobalExpansionIcon = data['deck']['symbol']
 
     else:
 
@@ -77,7 +77,7 @@ def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json"):
             module.CardSet = card_set_text
             module.DEFAULT_ARTIST = default_artist_name
             if expansion_symbol is not None:
-                module.Expansion_Icon = module.GetExpansionIcon(expansion_symbol)
+                module.GlobalExpansionIcon = expansion_symbol
         else:
             module.CardSet = os.path.dirname(filepath)
 
