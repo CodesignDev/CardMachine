@@ -82,8 +82,8 @@ def convert_files(pon_file_path, json_file_path, artist):
         # Clean up symbols: Ignore goal/ship as a symbol and don't make a list of them if there are none
         if row_data[SYMBOLS] != '':
             symbols = row_data[SYMBOLS].split('!')
-            if row_data[TYPE].lower() != 'pony' and row_data[TYPE] in symbols:
-                symbols.remove(row_data[TYPE])
+            # if row_data[TYPE].lower() != 'pony' and row_data[TYPE] in symbols:
+            #     symbols.remove(row_data[TYPE])
             if len(symbols) > 0:
                 card['symbols'] = symbols
 
