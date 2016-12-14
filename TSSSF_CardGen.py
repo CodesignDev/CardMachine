@@ -1,9 +1,10 @@
+# This Python file uses the following encoding: utf-8
 import os, glob, shutil, traceback, random
 import PIL_Helper
 
-TYPE, PICTURE, SYMBOLS, TITLE, KEYWORDS, BODY, FLAVOR, EXPANSION, CLIENT = range(9)
+TYPE, PICTURE, SYMBOLS, TITLE, KEYWORDS, BODY, FLAVOR, EXPANSION, OVERLAY, CLIENT, ARTIST = range(11)
 DIRECTORY = "TSSSF"
-ARTIST = "Pixel Prism"
+DEFAULT_ARTIST = "Pixel Prism"
 
 Expansion_Icon = None
 
@@ -16,6 +17,7 @@ workspace_path = os.path.dirname("workspace")
 card_set = os.path.dirname("deck.cards")
 CardSet = os.path.dirname("deck.cards")
 CardPath = DIRECTORY + "/Card Art/"
+OverlayPath = DIRECTORY + "/Card Overlays/"
 ResourcePath = DIRECTORY + "/resources/"
 BleedsPath = DIRECTORY + "/bleed-images/"
 CropPath = DIRECTORY + "/cropped-images/"
@@ -25,6 +27,7 @@ BleedTemplatesPath = ResourcePath + "/bleed templates/"
 SymbolsPath = ResourcePath + "/symbols/"
 ExpansionIconsPath = ResourcePath + "/expansion icons/"
 CardBacksPath = ResourcePath + "/card backs/"
+BleedCardBacksPath = ResourcePath + "/bleed backs/"
 FontsPath = ResourcePath + "/fonts/"
 
 VassalTemplatesPath = DIRECTORY + "/vassal templates/"
@@ -42,6 +45,8 @@ w_marg = 31
 h_marg = 36
 baserect = [(w_marg, h_marg), (base_w - w_marg, base_h - h_marg)]
 textmaxwidth = 689
+base_w_left = (base_w - textmaxwidth) / 2
+body_w_left = (base_w - 500) / 2
 
 croprect = (50, 63, 788 + 50, 1088 + 63)
 
@@ -54,7 +59,7 @@ fonts = {
     "TitleSmall": PIL_Helper.BuildFont(FontsPath + "TSSSFBartholomew-Bold.otf", 45),
     "Body": PIL_Helper.BuildFont(FontsPath + "TSSSFCabin-Medium.ttf", 35),
     "BodySmall": PIL_Helper.BuildFont(FontsPath + "TSSSFCabin-Medium.ttf", 35),
-    "BodyChangeling": PIL_Helper.BuildFont(FontsPath + "TSSSFCabin-Medium.ttf", 31),
+    "BodyChangeling": PIL_Helper.BuildFont(FontsPath + "TSSSFCabin-Medium.ttf", 29),
     "Bar": PIL_Helper.BuildFont(FontsPath + "TSSSFCabin-Medium.ttf", 38),
     "BarSmall": PIL_Helper.BuildFont(FontsPath + "TSSSFCabin-Medium.ttf", 35),
     "Flavortext": PIL_Helper.BuildFont(FontsPath + "KlinicSlabBookIt.otf", 28),
@@ -76,8 +81,11 @@ Anchors = {
     "TitleSmall": (-65 - 50, 157),
     "Bar": (-68 - 50, 598 + 67),
     "Body": (base_w_center, 735),
+    "BodyLeft": (body_w_left, 735),
     "BodyShiftedUp": (base_w_center, 730),
+    "BodyLeftShiftedUp": (body_w_left, 730),
     "Flavor": (base_w_center, -110),
+    "FlavorLeft": (base_w_left, -110),
     "Expansion": (640 + 50, 525 + 63),
     "Copyright": (-38 - 50, -13 - 61)
 }
@@ -95,13 +103,15 @@ ArtMissing = [
 Frames = {
     "START": PIL_Helper.LoadImage(BleedTemplatesPath + "BLEED-Blank-Start-bleed.png"),
     "Warning": PIL_Helper.LoadImage(CardPath + "BLEED_Card - Warning.png"),
+    "Warning2": PIL_Helper.LoadImage(CardPath + "BLEED_warning_CofK2.png"),
     "Pony": PIL_Helper.LoadImage(BleedTemplatesPath + "BLEED-Blank-Pony-bleed.png"),
     "Ship": PIL_Helper.LoadImage(BleedTemplatesPath + "BLEED-Blank-Ship-bleed.png"),
     "Rules1": PIL_Helper.LoadImage(CardPath + "BLEED_Rules1.png"),
-    "Rules3": PIL_Helper.LoadImage(CardPath + "BLEED_Rules3.png"),
+    "Rules3": PIL_Helper.LoadImage(CardPath + "BLEED_Rules3_edit.png"),
     "Rules5": PIL_Helper.LoadImage(CardPath + "BLEED_Rules5.png"),
     "Goal": PIL_Helper.LoadImage(BleedTemplatesPath + "BLEED-Blank-Goal-bleed.png"),
-    "Derpy": PIL_Helper.LoadImage(CardPath + "BLEED_Card - Derpy Hooves.png"),
+    #"Derpy": PIL_Helper.LoadImage(CardPath + "BLEED_Card - Derpy Hooves-new.png"),
+    "Derpy": PIL_Helper.LoadImage(CardPath + "BLEED-Pony-Derpy-Hooves-bleed-black-dot.png"),
     "TestSubject": PIL_Helper.LoadImage(CardPath + "BLEED_Card - OverlayTest Subject Cheerilee.png")
 }
 
@@ -183,13 +193,14 @@ RulesDict = {
     "{draw}": "You may draw 1 card from the Ship or Pony deck.",
     "{goal}": "You may discard 1 active Goal and draw 1 new Goal to replace it.",
     "{search}": "You may search the Ship or Pony discard pile for 1 card of your choice and put it into your hand. If it's still in your hand at the end of your turn, discard it.",
-    "{copy}": "You may copy the power of any Pony card currently on the shipping grid, except for Changelings.",
+    "{copy}": "You may copy the power of any Pony card currently on the shipping grid, except for Pony cards with the Changeling keyword.",
     "{hermaphrodite}": "May count as either {male} or {female} for all Goals, Ships, and powers.",
     "{double pony}": "This card counts as 2 Ponies.",
-    "{love poison}": "Instead of playing this Ship with a Pony card from your hand, or connecting two Pony cards already on the grid, you may take a Pony card from the shipping grid and reattach it elsewhere with this Ship. That card's power activates.",
+    #"{love poison}": "Instead of playing this Ship with a Pony card from your hand, or connecting two Pony cards already on the grid, you may take a Pony card from the shipping grid and reattach it elsewhere with this Ship. That card's power activates.",
+    "{love poison}": "Instead of playing this Ship with a Pony card from your hand, or connecting two Pony cards already on the shipping grid, you may take a Pony card from the grid and reattach it elsewhere with this Ship. That card's power activates.",
     "{keyword change}": "When you attach this card to the grid, you may choose one Pony card attached to this Ship. Until the end of your turn, that Pony card gains one keyword of your choice, except for Pony names.",
     "{gender change}": "When you attach this card to the grid, you may choose one Pony card attached to this Ship. Until the end of your turn, that Pony card becomes the opposite gender.",
-    "{race change}": "When you attach this card to the grid, you may choose one Pony card attached to this Ship. Until the end of your turn, that Pony card becomes the race of your choice. This cannot affect Changelings.",
+    "{race change}": "When you attach this card to the grid, you may choose one Pony card attached to this Ship. Until the end of your turn, that Pony card becomes the race of your choice. This cannot affect Pony cards with the Changeling keyword.",
     "{timeline change}": "When you attach this card to the grid, you may choose one Pony card attached to this Ship. Until the end of your turn, that Pony card's timeline becomes {postapocalypse}.",
     "{play from discard}": "You may choose to play the top card of the Pony discard pile with this Ship, rather than play a Pony card from your hand.",
     "{clone}": "When you attach this card to the grid, you may choose one Pony card attached to this Ship. Until the end of your turn, that Pony card counts as 2 Ponies.",
@@ -202,12 +213,29 @@ backs = {
      "Ship": PIL_Helper.LoadImage(CardBacksPath + "Back-Ships.png"),
      "Card": PIL_Helper.LoadImage(CardBacksPath + "Back-Main.png"),
      "Shipwrecker": PIL_Helper.LoadImage(CardBacksPath + "Back-Main.png"),
-     "BLANK": PIL_Helper.LoadImage(CardBacksPath + "Blank - Intentionally Left Blank.png"),
+     #"BLANK": PIL_Helper.LoadImage(CardPath + "Blank - Intentionally Left Blank.png"),
      "Rules1": PIL_Helper.LoadImage(CardPath + "Rules2.png"),
      "Rules3": PIL_Helper.LoadImage(CardPath + "Rules4.png"),
-     "Rules5": PIL_Helper.LoadImage(CardPath + "Rules6.png"),
+     "Rules5": PIL_Helper.LoadImage(CardPath + "Rules6_CofK.png"),
      "TestSubject": PIL_Helper.LoadImage(CardBacksPath + "Back-Main.png"),
-     "Warning": PIL_Helper.LoadImage(CardPath + "Card - Contact.png")
+     "Warning": PIL_Helper.LoadImage(CardPath + "Card_Contact_CofK.png"),
+     "Warning2": PIL_Helper.LoadImage(CardPath + "Card_Contact_CofK.png")
+}
+
+bleed_backs = {
+    "START": PIL_Helper.LoadImage(BleedCardBacksPath + "BLEED-Start-Back.png"),
+     "Pony": PIL_Helper.LoadImage(BleedCardBacksPath + "BLEED-Pony-Back.png"),
+     "Goal": PIL_Helper.LoadImage(BleedCardBacksPath + "BLEED-Goal-Back.png"),
+     "Ship": PIL_Helper.LoadImage(BleedCardBacksPath + "BLEED-Ship-Back.png"),
+     "Card": PIL_Helper.LoadImage(BleedCardBacksPath + "BLEED-Pony-Back.png"),
+     "Shipwrecker": PIL_Helper.LoadImage(BleedCardBacksPath + "BLEED-Pony-Back.png"),
+     #"BLANK": PIL_Helper.LoadImage(CardPath + "Blank - Intentionally Left Blank.png"),
+     "Rules1": PIL_Helper.LoadImage(CardPath + "BLEED_Rules2.png"),
+     "Rules3": PIL_Helper.LoadImage(CardPath + "BLEED_Rules4.png"),
+     "Rules5": PIL_Helper.LoadImage(CardPath + "BLEED_Rules6_CofK2.png"),
+     "TestSubject": PIL_Helper.LoadImage(BleedCardBacksPath + "BLEED-Pony-Back.png"),
+     "Warning": PIL_Helper.LoadImage(CardPath + "BLEED_warning_CofK2.png"),
+     "Warning2": PIL_Helper.LoadImage(CardPath + "BLEED_warning_CofK2.png")
 }
 
 special_card_types = ["Rules1", "Rules3", "Rules5", "Warning", "Derpy", "Card"]
@@ -299,7 +327,12 @@ def BuildCard(data):
         print "Warning, Bad Card: {0}".format(data)
         traceback.print_exc()
         im_crop = MakeBlankCard().crop(croprect)
-    return im_crop
+    # return im_crop
+    card_data = {
+        "bleed": im,
+        "cropped": im_crop
+    }
+    return card_data
 
 
 def BuildBack(data):
@@ -309,7 +342,12 @@ def BuildBack(data):
         card = data.strip('\n').strip('\r').replace(r'\n', '\n').split('`')
         card_type = card[TYPE]
 
-    return backs[card_type]
+    back_data = {
+        "bleed": bleed_backs[card_type],
+        "cropped": backs[card_type]
+    }
+    return back_data
+    # return backs[card_type]
 
 
 def PickCardFunc(card_type, data):
@@ -349,6 +387,15 @@ def AddCardArt(image, filename, anchor):
     art = PIL_Helper.ResizeImage(art, (ART_WIDTH, h))
     image.paste(art, anchor)
 
+def AddOverlay(image, filename):
+    if filename == "":
+        return
+    if os.path.exists(os.path.join(OverlayPath, filename)):
+        overlay = PIL_Helper.LoadImage(os.path.join(OverlayPath, filename))
+    else:
+        return
+    # Overlays should be the same size as the frame so just paste this on
+    image.paste(overlay, (0, 0), overlay)
 
 def AddSymbols(image, symbols, card_type=""):
     # Remove any timeline symbols from the symbols list
@@ -420,6 +467,7 @@ def BodyText(image, text, color, flavor_text_size=0, font=None):
     text = FixUnicode(text)
     if font is None:
         font = fonts["Body"]
+    #anchor = Anchors["BodyLeft"]
     anchor = Anchors["Body"]
     leading = -1
     # Get the size of the body text as (w,h)
@@ -429,6 +477,7 @@ def BodyText(image, text, color, flavor_text_size=0, font=None):
     # If the height of the body text plus the height of the flavor text
     # doesn't fit in on the card in the normal position, move the body text up
     if body_text_size[1] + flavor_text_size[1] > TextHeightThresholds[0]:
+        #anchor = Anchors["BodyLeftShiftedUp"]
         anchor = Anchors["BodyShiftedUp"]
     # If they still don't fit, makes the body text smaller
     if body_text_size[1] + flavor_text_size[1] > TextHeightThresholds[1]:
@@ -441,6 +490,7 @@ def BodyText(image, text, color, flavor_text_size=0, font=None):
         if body_text_size[1] + flavor_text_size[1] > TextHeightThresholds[1]:
             font = fonts["BodyChangeling"]
             leading = -3
+    #Anchors["BodyLeftShiftedUp"]
     Anchors["BodyShiftedUp"]
     PIL_Helper.AddText(
         image=image,
@@ -448,22 +498,28 @@ def BodyText(image, text, color, flavor_text_size=0, font=None):
         font=font,
         fill=color,
         anchor=anchor,
+        #halign="left",
         halign="center",
+        #max_width=textmaxwidth,
         max_width=textmaxwidth,
         leading_offset=leading
     )
 
 
 def FlavorText(image, text, color):
+    #text = FixUnicode(text)
     return PIL_Helper.AddText(
         image=image,
         text=text,
         font=fonts["Flavortext"],
         fill=color,
+        #anchor=Anchors["FlavorLeft"],
         anchor=Anchors["Flavor"],
         valign="bottom",
+        #halign="left",
         halign="center",
         leading_offset=+1,
+        #max_width=textmaxwidth,
         max_width=textmaxwidth,
     )
 
@@ -473,15 +529,14 @@ def GetExpansionIcon(expansion):
 
 
 def AddExpansion(image, expansion):
-    expansion_symbol = Expansions.get(expansion, None)
+    expansion_symbol = None
+    if expansion is not '':
+        expansion_symbol = PIL_Helper.LoadImage(ExpansionIconsPath + expansion)
+    if Expansion_Icon is not None:
+        expansion_symbol = Expansion_Icon
+
     if expansion_symbol:
         image.paste(expansion_symbol, Anchors["Expansion"], expansion_symbol)
-
-
-def AddExpansionJSON(image, expansion_symbol):
-    if expansion_symbol:
-        image.paste(expansion_symbol, Anchors["Expansion"], expansion_symbol)
-
 
 def CopyrightText(card, image, color, artist):
     card_set = CardSet.replace('_', ' ')
@@ -493,7 +548,8 @@ def CopyrightText(card, image, color, artist):
         if len(card) - 1 >= CLIENT:
             client = str(card[CLIENT])
 
-    if client is not None:
+    client = client or ''
+    if client is not '':
         card_set += " " + client
     text = "{}; TSSSF by Horrible People Games. Art by {}.".format(
         card_set,
@@ -539,9 +595,9 @@ def MakeStartCardJSON(data):
     BarText(image, ', '.join(data.get('keywords', [])), ColorDict["START bar text"])
     text_size = FlavorText(image, data.get('flavor', ''), ColorDict["START flavor"])
     BodyText(image, data.get('body', ''), ColorDict["START"], text_size)
-    CopyrightText(data, image, ColorDict["Copyright"], data.get('artist', ARTIST))
-    if Expansion_Icon is not None:
-        AddExpansionJSON(image, Expansion_Icon)
+    CopyrightText(data, image, ColorDict["Copyright"], data.get('artist', DEFAULT_ARTIST))
+    AddOverlay(image, data['overlay'])
+    AddExpansion(image, data['expansion'])
     return image
 
 
@@ -553,9 +609,9 @@ def MakeStartCardPON(tags):
     BarText(image, tags[KEYWORDS], ColorDict["START bar text"])
     text_size = FlavorText(image, tags[FLAVOR], ColorDict["START flavor"])
     BodyText(image, tags[BODY], ColorDict["START"], text_size)
-    CopyrightText(tags, image, ColorDict["Copyright"], ARTIST)
-    if len(tags) > EXPANSION:
-        AddExpansion(image, tags[EXPANSION])
+    CopyrightText(tags, image, ColorDict["Copyright"], (tags[ARTIST] or DEFAULT_ARTIST))
+    AddOverlay(image, tags[OVERLAY])
+    AddExpansion(image, tags[EXPANSION])
     return image
 
 
@@ -574,9 +630,9 @@ def MakePonyCardJSON(data):
     BarText(image, ', '.join(data.get('keywords', [])), ColorDict["Pony bar text"])
     text_size = FlavorText(image, data.get('flavor', ''), ColorDict["Pony flavor"])
     BodyText(image, data.get('body', ''), ColorDict["Pony"], text_size)
-    CopyrightText(data, image, ColorDict["Copyright"], data.get('artist', ARTIST))
-    if Expansion_Icon is not None:
-        AddExpansionJSON(image, Expansion_Icon)
+    CopyrightText(data, image, ColorDict["Copyright"], data.get('artist', DEFAULT_ARTIST))
+    AddOverlay(image, data['overlay'])
+    AddExpansion(image, data['expansion'])
     return image
 
 
@@ -588,9 +644,9 @@ def MakePonyCardPON(tags):
     BarText(image, tags[KEYWORDS], ColorDict["Pony bar text"])
     text_size = FlavorText(image, tags[FLAVOR], ColorDict["Pony flavor"])
     BodyText(image, tags[BODY], ColorDict["Pony"], text_size)
-    CopyrightText(tags, image, ColorDict["Copyright"], ARTIST)
-    if len(tags) > EXPANSION:
-        AddExpansion(image, tags[EXPANSION])
+    CopyrightText(tags, image, ColorDict["Copyright"], (tags[ARTIST] or DEFAULT_ARTIST))
+    AddOverlay(image, tags[OVERLAY])
+    AddExpansion(image, tags[EXPANSION])
     return image
 
 
@@ -610,8 +666,8 @@ def MakeShipCardJSON(data):
     text_size = FlavorText(image, data.get('flavor', ''), ColorDict["Ship flavor"])
     BodyText(image, data.get('body', ''), ColorDict["Ship"], text_size)
     CopyrightText(data, image, ColorDict["Copyright"], data.get('artist', ARTIST))
-    if Expansion_Icon is not None:
-        AddExpansionJSON(image, Expansion_Icon)
+    AddOverlay(image, data['overlay'])
+    AddExpansion(image, data['expansion'])
     return image
 
 
@@ -623,9 +679,9 @@ def MakeShipCardPON(tags):
     BarText(image, tags[KEYWORDS], ColorDict["Ship bar text"])
     text_size = FlavorText(image, tags[FLAVOR], ColorDict["Ship flavor"])
     BodyText(image, tags[BODY], ColorDict["Ship"], text_size)
-    CopyrightText(tags, image, ColorDict["Copyright"], ARTIST)
-    if len(tags) > EXPANSION:
-        AddExpansion(image, tags[EXPANSION])
+    CopyrightText(tags, image, ColorDict["Copyright"], (tags[ARTIST] or DEFAULT_ARTIST))
+    AddOverlay(image, tags[OVERLAY])
+    AddExpansion(image, tags[EXPANSION])
     return image
 
 
@@ -644,8 +700,8 @@ def MakeGoalCardJSON(data):
     text_size = FlavorText(image, data.get('flavor', ''), ColorDict["Goal flavor"])
     BodyText(image, data.get('body', ''), ColorDict["Goal"], text_size)
     CopyrightText(data, image, ColorDict["Copyright"], data.get('artist', ARTIST))
-    if Expansion_Icon is not None:
-        AddExpansionJSON(image, Expansion_Icon)
+    AddOverlay(image, data['overlay'])
+    AddExpansion(image, data['expansion'])
     return image
 
 
@@ -656,9 +712,9 @@ def MakeGoalCardPON(tags):
     AddSymbols(image, tags[SYMBOLS].split('!'), card_type="Goal")
     text_size = FlavorText(image, tags[FLAVOR], ColorDict["Goal flavor"])
     BodyText(image, tags[BODY], ColorDict["Goal"], text_size)
-    CopyrightText(tags, image, ColorDict["Copyright"], ARTIST)
-    if len(tags) > EXPANSION:
-        AddExpansion(image, tags[EXPANSION])
+    CopyrightText(tags, image, ColorDict["Copyright"], (tags[ARTIST] or DEFAULT_ARTIST))
+    AddOverlay(image, tags[OVERLAY])
+    AddExpansion(image, tags[EXPANSION])
     return image
 
 
@@ -674,8 +730,7 @@ def MakeSpecialCardJSON(data):
     image = GetFrame(data['picture'])
     if data['picture'] in special_cards_with_copyright:
         CopyrightText(data, image, ColorDict["Copyright"], data.get('artist', ARTIST))
-    if Expansion_Icon is not None:
-        AddExpansionJSON(image, Expansion_Icon)
+    AddExpansion(image, data['expansion'])
     return image
 
 
@@ -683,9 +738,8 @@ def MakeSpecialCardPON(data):
     print repr(data[PICTURE])
     image = GetFrame(data[PICTURE])
     if data[PICTURE] in special_cards_with_copyright:
-        CopyrightText(data, image, ColorDict["Copyright"], ARTIST)
-    if len(data) > EXPANSION:
-        AddExpansion(image, data[EXPANSION])
+        CopyrightText(data, image, ColorDict["Copyright"], (tags[ARTIST] or DEFAULT_ARTIST))
+    AddExpansion(image, tags[EXPANSION])
     return image
 
 
