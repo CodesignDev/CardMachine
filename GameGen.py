@@ -11,7 +11,7 @@ from sys import exit
 import json
 
 
-def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json"):
+def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json", watermark=""):
     '''
     @param folder: The base game folder where we'll be working.
         E.g. TSSSF, BaBOC
@@ -86,6 +86,9 @@ def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json"):
     module.CardPath = os.path.join(folder, card_set, "art")
     module.OverlayPath = os.path.join(folder, card_set, "overlay")
     module.ExpansionIconsPath = os.path.join(folder, card_set, "expansion-icon")
+
+    if watermark != "":
+        module.WatermarkImage = os.path.join(folder, "watermarks", watermark)
 
     # Create workspace for card images
     workspace_path = CleanDirectory(path=folder, mkdir="workspace", rmstring="*.*")
@@ -187,7 +190,10 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--basedir',
                         help="Workspace base directory with resources output directory",
                         default="TSSSF")
+    parser.add_argument('-w', '--watermark', \
+                        help="Specify the watermark to apply to all generated cards",
+                        default="")
 
     args = parser.parse_args()
 
-    main(args.basedir, args.set_file)
+    main(args.basedir, args.set_file, args.watermark)

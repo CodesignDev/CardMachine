@@ -2,12 +2,16 @@
 import os, glob, shutil, traceback, random
 import PIL_Helper
 
+from PIL import Image, ImageEnhance
+
 TYPE, PICTURE, SYMBOLS, TITLE, KEYWORDS, BODY, FLAVOR, EXPANSION, OVERLAY, CLIENT, ARTIST = range(11)
 DIRECTORY = "TSSSF"
 DEFAULT_ARTIST = "Pixel Prism"
 
 Expansion_Icon = None
 GlobalExpansionIcon = None
+
+WatermarkImage = None
 
 LegacySymbolMode = False
 PAGE_WIDTH = 3
@@ -311,6 +315,7 @@ def BuildCard(data):
 
     try:
         im = PickCardFunc(card_type, card)
+        im = AddWatermark(im)
         if picture is not None:
             if title is not None:
                 filename = FixFileName(card_type + "_" + title)
@@ -397,6 +402,32 @@ def AddOverlay(image, filename):
         return
     # Overlays should be the same size as the frame so just paste this on
     image.paste(overlay, (0, 0), overlay)
+
+
+def AddWatermark(image):
+    if WatermarkImage is None:
+        return
+    if os.path.exists(WatermarkImage):
+        watermark = PIL_Helper.LoadImage(WatermarkImage)
+    else:
+        return
+
+    if image.mode != 'RGBA':
+        image = image.convert('RGBA')
+
+    if watermark.mode != 'RGBA':
+        watermark = watermark.convert('RGBA')
+    else:
+        watermark = watermark.copy()
+
+    alpha = watermark.split()[3]
+    alpha = ImageEnhance.Brightness(alpha).enhance(0.25) # 25% Opacity
+
+    watermark.putalpha(alpha)
+    watermarklayer = Image.new('RGBA', image.size, (0, 0, 0, 0))
+    watermarklayer.paste(watermark, (0, 0))
+    return Image.alpha_composite(image, watermarklayer)
+
 
 def AddSymbols(image, symbols, card_type=""):
     # Remove any timeline symbols from the symbols list
