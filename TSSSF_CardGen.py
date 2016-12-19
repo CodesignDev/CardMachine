@@ -406,11 +406,11 @@ def AddOverlay(image, filename):
 
 def AddWatermark(image):
     if WatermarkImage is None:
-        return
+        return image
     if os.path.exists(WatermarkImage):
         watermark = PIL_Helper.LoadImage(WatermarkImage)
     else:
-        return
+        return image
 
     if image.mode != 'RGBA':
         image = image.convert('RGBA')
