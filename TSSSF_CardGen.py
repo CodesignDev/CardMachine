@@ -248,7 +248,7 @@ special_cards_with_copyright = ["Derpy"]
 
 
 def FixFileName(tagin):
-    FileName = tagin.replace("\n", "")
+    FileName = tagin.replace("\n", " ")
     invalid_chars = [",", "?", '"', ":"]
     for c in invalid_chars:
         FileName = FileName.replace(c, "")
