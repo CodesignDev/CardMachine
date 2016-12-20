@@ -553,6 +553,7 @@ def FlavorText(image, text, color):
         leading_offset=+1,
         #max_width=textmaxwidth,
         max_width=textmaxwidth,
+        padline=True
     )
 
 
