@@ -78,7 +78,6 @@ def AddText(image, text, font, fill=(0,0,0), anchor=(0,0),
         wrapped_text = WrapText(text, font, max_width)
     else:
         wrapped_text = text
-    # wrapped_text = wrapped_text.replace('|', ' ')
     lines = wrapped_text.split('\n')
 
     # Initiliaze layer and draw object
