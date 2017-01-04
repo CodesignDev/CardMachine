@@ -584,7 +584,9 @@ def CopyrightText(card, image, color, artist):
     client = client or ''
     if client is not '':
         card_set += " " + client
-    text = "{}; TSSSF by Horrible People Games. Art by {}.".format(
+    if card_set is not '':
+        card_set += "; "
+    text = "{}TSSSF by Horrible People Games. Art by {}.".format(
         card_set,
         artist
     )
