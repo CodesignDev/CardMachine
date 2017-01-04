@@ -563,6 +563,8 @@ def GetExpansionIcon(expansion):
 
 def AddExpansion(image, expansion):
     expansion_symbol = None
+    if expansion.lower() == "none" or expansion.lower() == "blank":
+        return
     if expansion is not '':
         expansion_symbol = PIL_Helper.LoadImage(os.path.join(ExpansionIconsPath, expansion))
     if GlobalExpansionIcon is not None:
