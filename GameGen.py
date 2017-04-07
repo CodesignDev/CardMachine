@@ -11,7 +11,7 @@ from sys import exit
 import json
 
 
-def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json", watermark=""):
+def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json", watermark="", generate_pdf=True):
     '''
     @param folder: The base game folder where we'll be working.
         E.g. TSSSF, BaBOC
@@ -127,7 +127,7 @@ def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json", watermark=""):
         # If the card_list is big enough to make a page
         # do that now, and set the card list to empty again
         #
-        if len(card_list) >= module.TOTAL_CARDS:
+        if len(card_list) >= module.TOTAL_CARDS and generate_pdf:
             page_num += 1
             print "Building Page {}...".format(page_num)
             BuildPage(card_list, page_num, module.PAGE_WIDTH, module.PAGE_HEIGHT, workspace_path)
@@ -137,7 +137,7 @@ def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json", watermark=""):
 
     # If there are leftover cards, fill in the remaining
     # card slots with blanks and gen the last page
-    if len(card_list) > 0:
+    if len(card_list) > 0 and generate_pdf:
         # Fill in the missing slots with blanks
         while len(card_list) < module.TOTAL_CARDS:
             card_list.append(module.BuildCard("BLANK")['cropped'])
@@ -166,12 +166,14 @@ def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json", watermark=""):
     # Build Vassal
     # module.CompileVassalModule()
 
-    print "\nCreating PDF..."
-    # os.system(r'convert "{}/card_*.png" "{}/{} Cards.pdf"'.format(workspace_path, output_folder, card_set))
-    os.system(r'convert "{}/page_*.png" "{}/{}.pdf"'.format(workspace_path, output_folder, card_set))
-    #print "\nCreating PDF of backs..."
-    os.system(r'convert "{}/backs_*.png" "{}/backs_{}.pdf"'.format(workspace_path, output_folder, card_set))
-    print "Done!"
+    # Generate PDF files if required
+    if generate_pdf:
+        print "\nCreating PDF..."
+        # os.system(r'convert "{}/card_*.png" "{}/{} Cards.pdf"'.format(workspace_path, output_folder, card_set))
+        os.system(r'convert "{}/page_*.png" "{}/{}.pdf"'.format(workspace_path, output_folder, card_set))
+        #print "\nCreating PDF of backs..."
+        os.system(r'convert "{}/backs_*.png" "{}/backs_{}.pdf"'.format(workspace_path, output_folder, card_set))
+        print "Done!"
 
 
 if __name__ == '__main__':
@@ -193,7 +195,10 @@ if __name__ == '__main__':
     parser.add_argument('-w', '--watermark', \
                         help="Specify the watermark to apply to all generated cards",
                         default="")
+    parser.add_argument('--no-pdf',
+                        help="Do not generate PDF files",
+                        action="store_false")
 
     args = parser.parse_args()
 
-    main(args.basedir, args.set_file, args.watermark)
+    main(args.basedir, args.set_file, args.watermark, args.no_pdf)
