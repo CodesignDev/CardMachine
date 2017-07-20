@@ -188,7 +188,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-f', '--set-file', \
                         help="Location of set file to be parsed",
-                        default="cards.json")
+                        default="")
     parser.add_argument('-b', '--basedir',
                         help="Workspace base directory with resources output directory",
                         default="TSSSF")
@@ -201,4 +201,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.basedir, args.set_file, args.watermark, args.no_pdf)
+    set_file = args.set_file
+    if set_file is "":
+        set_file = raw_input("Please enter the location of the set you would like to generate [Core Deck/cards.pon]: ")
+
+    main(args.basedir, set_file, args.watermark, args.no_pdf)
