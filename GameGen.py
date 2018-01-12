@@ -107,22 +107,10 @@ def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json", watermark="", ge
     # Make pages
     card_list = []
     back_list = []
-    bleed_cards = []
     page_num = 0
     for line in cards:
-        card = module.BuildCard(line)
-        back = module.BuildBack(line)
-
-        card_list.append(card['cropped'])
-        back_list.append(back['cropped'])
-
-        # card_list.append(module.BuildCard(line))
-        # back_list.append(module.BuildBack(line))
-        # card_list.append(card)
-        # back_list.append(back)
-
-        bleed_cards.append(back['bleed'])
-        bleed_cards.append(card['bleed'])
+        card_list.append(module.BuildCard(line))
+        back_list.append(module.BuildBack(line))
 
         # If the card_list is big enough to make a page
         # do that now, and set the card list to empty again
@@ -140,28 +128,13 @@ def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json", watermark="", ge
     if len(card_list) > 0 and generate_pdf:
         # Fill in the missing slots with blanks
         while len(card_list) < module.TOTAL_CARDS:
-            card_list.append(module.BuildCard("BLANK")['cropped'])
-            back_list.append(module.BuildCard("BLANK")['cropped'])
+            card_list.append(module.BuildCard("BLANK"))
+            back_list.append(module.BuildCard("BLANK"))
         page_num += 1
         print "Building Page {}...".format(page_num)
         # print card_list
         BuildPage(card_list, page_num, module.PAGE_WIDTH, module.PAGE_HEIGHT, workspace_path)
         BuildBack(back_list, page_num, module.PAGE_WIDTH, module.PAGE_HEIGHT, workspace_path)
-
-    # w,h = bleed_cards[0].size
-    # card_num = 0
-    # for x in xrange(len(bleed_cards)):
-    #     card_num += 1
-    #     card_to_paste = Image.new("RGB", (w, h))
-    #     card = bleed_cards.pop(0)
-    #     card_to_paste.paste(card, (0, 0))
-    #     card_to_paste.save(
-    #         os.path.join(
-    #             workspace_path,
-    #             "card_{0:>03}.png".format(card_num)
-    #         ), dpi=(300, 300))
-
-
 
     # Build Vassal
     # module.CompileVassalModule()
@@ -171,7 +144,6 @@ def main(folder="TSSSF", filepath="Core Deck 1.1.6/cards.json", watermark="", ge
         print "\nCreating PDF..."
         # os.system(r'convert "{}/card_*.png" "{}/{} Cards.pdf"'.format(workspace_path, output_folder, card_set))
         os.system(r'convert "{}/page_*.png" "{}/{}.pdf"'.format(workspace_path, output_folder, card_set))
-        #print "\nCreating PDF of backs..."
         os.system(r'convert "{}/backs_*.png" "{}/backs_{}.pdf"'.format(workspace_path, output_folder, card_set))
         print "Done!"
 

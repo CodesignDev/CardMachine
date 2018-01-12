@@ -333,12 +333,7 @@ def BuildCard(data):
         print "Warning, Bad Card: {0}".format(data)
         traceback.print_exc()
         im_crop = MakeBlankCard().crop(croprect)
-    # return im_crop
-    card_data = {
-        "bleed": im,
-        "cropped": im_crop
-    }
-    return card_data
+    return im_crop
 
 
 def BuildBack(data):
@@ -348,12 +343,7 @@ def BuildBack(data):
         card = data.strip('\n').strip('\r').replace(r'\n', '\n').split('`')
         card_type = card[TYPE]
 
-    back_data = {
-        "bleed": bleed_backs[card_type],
-        "cropped": backs[card_type]
-    }
-    return back_data
-    # return backs[card_type]
+    return backs[card_type]
 
 
 def PickCardFunc(card_type, data):
